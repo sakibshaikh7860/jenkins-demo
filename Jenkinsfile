@@ -7,27 +7,21 @@ pipeline {
                     url: 'https://github.com/sakibshaikh7860/jenkins-demo.git'
             }
         }
-        stage("Build") {
+        stage("Docker Build") {
             steps {
-                echo "Code build ho raha hai..."
-                sh "cat index.html"
+                sh "docker build -t jenkins-demo-app ."
             }
         }
-        stage("Test") {
+        stage("Docker Run") {
             steps {
-                echo "Tests run ho rahe hain..."
-                sh "echo 'All tests passed!'"
-            }
-        }
-        stage("Deploy") {
-            steps {
-                echo "Deploy ho raha hai..."
-                sh "echo 'Deployed successfully!'"
+                sh "docker stop jenkins-demo || true"
+                sh "docker rm jenkins-demo || true"
+                sh "docker run -d --name jenkins-demo -p 8090:80 jenkins-demo-app"
             }
         }
     }
     post {
-        success { echo "Pipeline SUCCESS!" }
+        success { echo "App deployed! Visit http://localhost:8090" }
         failure { echo "Pipeline FAILED!" }
     }
-}
+} 
