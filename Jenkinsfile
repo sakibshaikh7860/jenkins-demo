@@ -24,6 +24,11 @@ pipeline {
                 sh "docker run -d --name jenkins-demo -p 8090:80 jenkins-demo-app"
             }
         }
+	stage("Verify") {
+	   steps {
+		sh "docker ps | grep jenkins-demo"
+	    }
+	}
     }
     post {
         success { echo "App deployed! Visit http://localhost:8090" }
