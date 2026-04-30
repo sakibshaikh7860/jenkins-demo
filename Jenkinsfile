@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_IMAGE = "sakibshaikh7840/jenkins-demo-app"
+    }
     stages {
         stage("Code Clone") {
             steps {
@@ -9,29 +12,31 @@ pipeline {
         }
         stage("Docker Build") {
             steps {
-                sh "docker build -t jenkins-demo-app ."
+                sh "docker build -t ${DOCKER_IMAGE}:latest ."
             }
         }
-	stage("Notify"){
-	    steps {
-		echo "Build complate,Tell to team"
-	     }
-	}
+        stage("Docker Push") {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
         stage("Docker Run") {
             steps {
                 sh "docker stop jenkins-demo || true"
                 sh "docker rm jenkins-demo || true"
-                sh "docker run -d --name jenkins-demo -p 8090:80 jenkins-demo-app"
+                sh "docker run -d --name jenkins-demo -p 8090:80 ${DOCKER_IMAGE}:latest"
             }
         }
-	stage("Verify") {
-	   steps {
-		sh "docker ps | grep jenkins-demo"
-	    }
-	}
     }
     post {
         success { echo "App deployed! Visit http://localhost:8090" }
         failure { echo "Pipeline FAILED!" }
     }
-} 
+}
