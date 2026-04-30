@@ -12,6 +12,11 @@ pipeline {
                 sh "docker build -t jenkins-demo-app ."
             }
         }
+	stage("Notify"){
+	    steps {
+		echo "Build complate,Tell to team"
+	     }
+	}
         stage("Docker Run") {
             steps {
                 sh "docker stop jenkins-demo || true"
