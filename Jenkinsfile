@@ -29,9 +29,8 @@ pipeline {
         }
         stage("Docker Run") {
             steps {
-                sh "docker stop jenkins-demo || true"
-                sh "docker rm jenkins-demo || true"
-                sh "docker run -d --name jenkins-demo -p 8090:80 ${DOCKER_IMAGE}:latest"
+                echo "deploying contaner"
+		sh "docker-compose down && docker-compose up -d"
             }
         }
     }
