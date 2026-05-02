@@ -3,4 +3,4 @@ services:
   web:
     image: sakibshaikh7840/jenkins-demo-app:latest
     ports:
-      - "8080:80"
+      - "8090:80"
